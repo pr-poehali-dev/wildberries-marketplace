@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const [favCount, setFavCount] = useState(0);
   const [priceRange, setPriceRange] = useState([0, 50000]);
@@ -312,8 +314,9 @@ const Index = () => {
             {filteredProducts.map((product, index) => (
               <Card 
                 key={product.id}
-                className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 animate-fade-in"
+                className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 animate-fade-in cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => navigate(`/product/${product.id}`)}
               >
                 <div className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-100 to-gray-200">
                   <img 
@@ -330,7 +333,10 @@ const Index = () => {
                     variant="ghost"
                     size="icon"
                     className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-all"
-                    onClick={addToFavorites}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToFavorites();
+                    }}
                   >
                     <Icon name="Heart" size={20} />
                   </Button>
@@ -360,7 +366,10 @@ const Index = () => {
 
                   <Button 
                     className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all hover:shadow-lg"
-                    onClick={addToCart}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart();
+                    }}
                   >
                     <Icon name="ShoppingCart" className="mr-2" size={18} />
                     В корзину
