@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useCartStore } from '@/lib/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,11 +13,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Product = () => {
   const navigate = useNavigate();
+  const { addItem, getTotalItems } = useCartStore();
+  const cartCount = getTotalItems();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('M');
 
   const product = {
     id: 1,
@@ -107,7 +108,14 @@ const Product = () => {
   ];
 
   const addToCart = () => {
-    setCartCount(prev => prev + quantity);
+    for (let i = 0; i < quantity; i++) {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0]
+      });
+    }
   };
 
   return (
@@ -135,40 +143,19 @@ const Product = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative hover:bg-purple-100 rounded-xl">
-                    <Icon name="ShoppingCart" size={24} />
-                    {cartCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
-                        {cartCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Корзина</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    {cartCount > 0 ? (
-                      <div className="space-y-4">
-                        <p className="text-center text-green-600 font-semibold">
-                          Товаров в корзине: {cartCount}
-                        </p>
-                        <Button className="w-full rounded-xl">
-                          Оформить заказ
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="text-center text-gray-500">
-                        <Icon name="ShoppingCart" size={48} className="mx-auto mb-4 text-gray-300" />
-                        <p>Ваша корзина пуста</p>
-                      </div>
-                    )}
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative hover:bg-purple-100 rounded-xl"
+                onClick={() => navigate('/cart')}
+              >
+                <Icon name="ShoppingCart" size={24} />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
             </div>
           </div>
         </div>

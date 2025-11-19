@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '@/lib/cartStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +12,8 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const navigate = useNavigate();
-  const [cartCount, setCartCount] = useState(0);
+  const { addItem, getTotalItems } = useCartStore();
+  const cartCount = getTotalItems();
   const [favCount, setFavCount] = useState(0);
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -100,7 +102,14 @@ const Index = () => {
     p.price >= priceRange[0] && p.price <= priceRange[1]
   );
 
-  const addToCart = () => setCartCount(prev => prev + 1);
+  const addToCart = (product: typeof products[0]) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image
+    });
+  };
   const addToFavorites = () => setFavCount(prev => prev + 1);
 
   return (
@@ -150,27 +159,19 @@ const Index = () => {
                 </SheetContent>
               </Sheet>
 
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative hover:bg-purple-100 rounded-xl transition-all">
-                    <Icon name="ShoppingCart" size={24} />
-                    {cartCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 animate-scale-in">
-                        {cartCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Корзина</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6 text-center text-gray-500">
-                    <Icon name="ShoppingCart" size={48} className="mx-auto mb-4 text-gray-300" />
-                    <p>Ваша корзина пуста</p>
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative hover:bg-purple-100 rounded-xl transition-all"
+                onClick={() => navigate('/cart')}
+              >
+                <Icon name="ShoppingCart" size={24} />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 animate-scale-in">
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
 
               <Button variant="ghost" size="icon" className="hover:bg-purple-100 rounded-xl transition-all">
                 <Icon name="User" size={24} />
@@ -368,7 +369,7 @@ const Index = () => {
                     className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all hover:shadow-lg"
                     onClick={(e) => {
                       e.stopPropagation();
-                      addToCart();
+                      addToCart(product);
                     }}
                   >
                     <Icon name="ShoppingCart" className="mr-2" size={18} />
